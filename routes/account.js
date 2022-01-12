@@ -38,7 +38,7 @@ router.post("/sign-in", (req, resp) => {
 
         const token = jwt.sign({email}, JWT_SECRET);
 
-        resp.cookie("token", token, { path: "/", httpOnly: true });
+        resp.cookie("token", token, { path: "/", httpOnly: true, sameSite: "none" });
 
         return resp.status(200).json({success: true, message: "Sign-in successful"});
     });
