@@ -11,7 +11,7 @@ mongoose.connect(DB_URL);
 
 app.use(cookieParser());
 app.use(cors({
-   origin: ["http://localhost:5555"],
+   origin: ["http://localhost:5555", "http://localhost:80", "http://92.205.16.57:5555", "http://92.205.16.57:80"],
    credentials: true,
 }));
 app.use(express.json());
