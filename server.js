@@ -16,7 +16,7 @@ app.use("*", (req, resp, next) => {
    next();
 })
 app.use(cors({
-   origin: ["http://localhost:5555", "http://92.205.16.57:80"],
+   origin: ["http://localhost:3000", "http://localhost:5555", "http://92.205.16.57"],
    credentials: true,
 }));
 app.use(express.json());
