@@ -16,14 +16,12 @@ router.get("/", (req, resp) => {
 });
 
 router.get("/by-id/:id", (req, resp) => {
-    const {id} = req.params;
-    console.log(id);
+    const {id} = req.params;;
 
     posts.find({"_id": id}).then((data) => {
-        if (data.length === 0) return resp.status(404).json(data);
-        console.log(data[0]);
+        if (data.length === 0) return resp.status(404).json({sucess: false});
 
-        return resp.status(200).json(data[0]);
+        return resp.status(200).json({success: true, post: data[0]});
     }).catch((err) => {
         return resp.status(500).json({success: false, message: "DB_ERROR"});
     });
