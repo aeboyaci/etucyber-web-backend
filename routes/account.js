@@ -10,6 +10,15 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const users = require("../models/account");
 const codes = require("../models/invite_code");
 
+router.get("/validate", Authorize, (req, resp) => {
+    return resp.status(200).json({ success: true });
+});
+router.get("/logout", (req, resp) => {
+    resp.clearCookie("token");
+
+    return resp.status(200).send();
+});
+
 router.post("/sign-in", (req, resp) => {
     const {email, password} = req.body;
 

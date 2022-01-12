@@ -7,18 +7,28 @@ const Authorize = require("../authorize");
 
 router.get("/", (req, resp) => {
     posts.find({}).then((data) => {
-        console.log(data);
-
         return resp.status(200).json(data);
     }).catch((err) => {
         return resp.status(500).json({success: false, message: "DB_ERROR"});
     });
 });
 
-router.get("/by-id/:id", (req, resp) => {
-    const {id} = req.params;;
+router.get("/my-posts", Authorize, (req, resp) => {
+    const email = req.userEmail;
 
-    posts.find({"_id": id}).then((data) => {
+    posts.find({email}).then((data) => {
+        return resp.status(200).json(data);
+    }).catch((err) => {
+        return resp.status(500).json({success: false, message: "DB_ERROR"});
+    });
+});
+
+router.get("/by-id/:id", Authorize, (req, resp) => {
+    const email = req.userEmail;
+    const {id} = req.params;
+    console.log(email, id);
+
+    posts.find({"_id": id, email}).then((data) => {
         if (data.length === 0) return resp.status(404).json({sucess: false});
 
         return resp.status(200).json({success: true, post: data[0]});
@@ -43,6 +53,8 @@ router.get("/:title", (req, resp) => {
 router.post("/", Authorize, (req, resp) => {
     const email = req.userEmail;
     const {imageUrl, title, description, isActive, html} = req.body;
+    console.log(email);
+    console.table(req.body);
 
     users.find({email}).then((data) => {
         const {displayName, photoUrl} = data[0];
@@ -85,9 +97,10 @@ router.post("/by-id/:id", Authorize, async (req, resp) => {
     return resp.status(200).json({ success: true, message: "Gönderi başarılı bir şekilde güncellendi." });
 });
 
-router.post("/delete/by-id/:id", Authorize, async (req, resp) => {
+router.get("/delete/by-id/:id", Authorize, async (req, resp) => {
     const email = req.userEmail;
     const { id } = req.params;
+    console.log(email, id);
 
     let post = await posts.findOne({email, "_id": id});
 

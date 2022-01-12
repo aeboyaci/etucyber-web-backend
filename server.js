@@ -9,8 +9,11 @@ const DB_URL = process.env.DB_URL;
 const app = express();
 mongoose.connect(DB_URL);
 
-app.use(cors());
 app.use(cookieParser());
+app.use(cors({
+   origin: ["http://localhost:3000"],
+   credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded( { extended: true } ));
 

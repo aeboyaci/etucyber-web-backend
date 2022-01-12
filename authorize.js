@@ -4,6 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 module.exports = function (req, resp, next) {
     const token = req.cookies.token;
+    console.log("token", token);
 
     if (!token) return resp.status(403).json({ success: false, message: "UNAUTHORIZED" });
 
