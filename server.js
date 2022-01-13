@@ -14,7 +14,7 @@ app.use("*", (req, resp, next) => {
    console.log("origin", req.headers.origin);
    console.log("host", req.headers.host);
    next();
-})
+});
 app.use(cors({
    origin: ["http://localhost:3000", "http://localhost:5555", "http://92.205.16.57"],
    credentials: true,
@@ -30,6 +30,15 @@ api.use("/posts", PostsRoute);
 
 const AccountRoute = require("./routes/account");
 api.use("/account", AccountRoute);
+
+const InviteRoute = require("./routes/invite");
+api.use("/invite", InviteRoute);
+
+api.get("/uploads/:fileName", (req, resp) => {
+   const {fileName} = req.params;
+
+   return resp.sendFile(`${__dirname}/routes/uploads/${fileName}`);
+});
 
 app.listen(PORT, () => {
    console.log("Listening on port " + PORT);

@@ -1,6 +1,8 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const multer = require("multer");
+
 const Authorize = require("../authorize");
 
 const router = express.Router();
@@ -37,10 +39,12 @@ router.post("/sign-in", (req, resp) => {
         });
 
         const token = jwt.sign({email}, JWT_SECRET);
+        const user = {displayName: data[0].displayName, photoUrl: data[0].photoUrl};
 
-        resp.cookie("token", token, { path: "/", httpOnly: true, sameSite: "none" });
+        resp.cookie("token", token, { path: "/", httpOnly: true, secure: true, sameSite: "none" });
+        resp.cookie("user", JSON.stringify(user), { path: "/" });
 
-        return resp.status(200).json({success: true, message: "Sign-in successful"});
+        return resp.status(200).json({success: true, message: "Sign-in successful", ...user});
     });
 });
 
@@ -76,7 +80,33 @@ router.post("/sign-up", (req, resp) => {
 
 });
 
-router.post("/profile-update", Authorize, (req, resp, next) => {
+// Uploads
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, `${__dirname}/uploads`);
+    },
+    filename: (req, file, cb) => {
+        const fn = file.originalname;
+        cb(null, `${new Date().toLocaleString('tr').split(" ")[0].replace(".", "-").replace(".", "-")}_${fn}`);
+    },
+});
+const upload = multer({
+    storage: multerStorage
+});
+
+router.post("/profile-update/change-avatar", Authorize, upload.single("profilePic"), (req, resp, next) => {
+    const email = req.userEmail;
+    const photoUrl = `http://localhost:3001/api/uploads/${req.file.filename}`;
+
+    users.updateOne({email}, {$set: { photoUrl }}).then((data) => {
+        return resp.status(200).json({success: true, message: "Profil resmi başarı ile güncellendi."});
+    }).catch((err) => {
+        console.log(err);
+        return resp.status(500).json({success: false, message: "Veri tabanı hatası meydana geldi. Profil resmi güncellenemedi."});
+    });
+});
+
+router.post("/profile-update/change-password", Authorize, (req, resp, next) => {
     const email = req.userEmail;
 });
 
