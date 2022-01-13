@@ -42,7 +42,7 @@ router.post("/sign-in", (req, resp) => {
         const user = {displayName: data[0].displayName, photoUrl: data[0].photoUrl};
 
         resp.cookie("token", token, { path: "/", httpOnly: true, secure: true, sameSite: "none" });
-        resp.cookie("user", JSON.stringify(user), { path: "/" });
+        resp.cookie("user", JSON.stringify(user), { path: "/", secure: true, sameSite: "none" });
 
         return resp.status(200).json({success: true, message: "Sign-in successful", ...user});
     });
