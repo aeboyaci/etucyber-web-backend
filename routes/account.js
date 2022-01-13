@@ -16,7 +16,8 @@ router.get("/validate", Authorize, (req, resp) => {
     return resp.status(200).json({ success: true });
 });
 router.get("/logout", (req, resp) => {
-    resp.clearCookie("token");
+    resp.clearCookie("token", { path: "/", domain: ".etucyber.com" });
+    resp.clearCookie("user", { path: "/", domain: ".etucyber.com" });
 
     return resp.status(200).send();
 });
@@ -41,8 +42,8 @@ router.post("/sign-in", (req, resp) => {
         const token = jwt.sign({email}, JWT_SECRET);
         const user = {displayName: data[0].displayName, photoUrl: data[0].photoUrl};
 
-        resp.cookie("token", token, { path: "/", httpOnly: true, secure: true, sameSite: "none" });
-        resp.cookie("user", JSON.stringify(user), { path: "/", secure: true, sameSite: "none" });
+        resp.cookie("token", token, { path: "/", httpOnly: true, secure: true, sameSite: "none", domain: ".etucyber.com" });
+        resp.cookie("user", JSON.stringify(user), { path: "/", secure: true, sameSite: "none", domain: ".etucyber.com" });
 
         return resp.status(200).json({success: true, message: "Sign-in successful", ...user});
     });
