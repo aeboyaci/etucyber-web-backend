@@ -34,6 +34,9 @@ api.use("/account", AccountRoute);
 const InviteRoute = require("./routes/invite");
 api.use("/invite", InviteRoute);
 
+const ContactRoute = require("./routes/contact");
+api.use("/contact", ContactRoute);
+
 api.get("/uploads/:fileName", (req, resp) => {
    const {fileName} = req.params;
 
