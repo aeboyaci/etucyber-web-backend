@@ -97,7 +97,7 @@ const upload = multer({
 
 router.post("/profile-update/change-avatar", Authorize, upload.single("profilePic"), (req, resp, next) => {
     const email = req.userEmail;
-    const photoUrl = `http://localhost:3001/api/uploads/${req.file.filename}`;
+    const photoUrl = `https://api.etucyber.com/api/uploads/${req.file.filename}`;
 
     users.updateOne({email}, {$set: { photoUrl }}).then((data) => {
         return resp.status(200).json({success: true, message: "Profil resmi başarı ile güncellendi."});
@@ -107,8 +107,38 @@ router.post("/profile-update/change-avatar", Authorize, upload.single("profilePi
     });
 });
 
-router.post("/profile-update/change-password", Authorize, (req, resp, next) => {
+router.post("/profile-update", Authorize, async (req, resp, next) => {
     const email = req.userEmail;
+    const { oldPassword, newPassword } = req.body;
+
+    let values = {};
+
+    values = { ...values, ...req.body };
+
+    if (Boolean(oldPassword)) {
+        const data = await users.find({email});
+        const user = data[0];
+        const hashedPassword = user.password;
+
+        const isMatched = await bcrypt.compareSync(oldPassword, hashedPassword);
+
+        if (!isMatched) {
+            return resp.status(400).json({success: false, message: "Parola hatalı."});
+        }
+
+        const newPasswordHash = await bcrypt.hashSync(newPassword, 10);
+
+        values = { password: newPasswordHash };
+        delete values["oldPassword"];
+        delete values["newPassword"];
+    }
+
+    users.updateOne({email}, {$set: { ...values }}).then((data) => {
+        return resp.status(200).json({success: true, message: "Profil başarı ile güncellendi."});
+    }).catch((err) => {
+        console.log(err);
+        return resp.status(500).json({success: false, message: "Veri tabanı hatası meydana geldi. Profil güncellenemedi."});
+    });
 });
 
 module.exports = router;
