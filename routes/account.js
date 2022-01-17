@@ -133,6 +133,13 @@ router.post("/profile-update", Authorize, async (req, resp, next) => {
         delete values["newPassword"];
     }
 
+    // Deleting empty fields.
+    for (let key in values) {
+        if (!Boolean(values[key])) {
+            delete values[key];
+        }
+    }
+
     users.updateOne({email}, {$set: { ...values }}).then((data) => {
         return resp.status(200).json({success: true, message: "Profil başarı ile güncellendi."});
     }).catch((err) => {
